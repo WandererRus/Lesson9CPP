@@ -3,30 +3,106 @@
 
 #include <iostream>
 using namespace std;
+
+class StringWorker {
+private:
+    string txt;
+public:
+    StringWorker(string text) : txt{ text } {}
+
+    void RemoveSpaces() {
+
+        int firstLetterPos = 0;
+        
+        while (isspace(txt[txt.size() - 1]))
+        {
+            txt.pop_back();
+        }
+        firstLetterPos = txt.find_first_not_of(" ");
+        int spacefound = 0;
+
+        while ((spacefound = txt.find("  ", firstLetterPos)) >= 0)
+        {
+            if (spacefound > firstLetterPos)
+            {
+                txt.replace(spacefound, 2, " ");
+            }
+        }
+    }
+
+    string GetTxt()
+    {
+        return txt;
+    }
+
+    string RemoveComment()
+    {
+        cout << txt << endl;
+        int startComment = 0;
+        int endComment = txt.size();
+
+        while (txt.find("/*", 0) != -1 || txt.find("*/", 0) != -1)
+        { 
+            startComment = 0;
+            endComment = txt.size();
+
+            while (txt.find("/*", startComment+2) > 0)
+            {
+                if (txt.find("/*", startComment+2) != -1)
+                {
+                    startComment = txt.find("/*", startComment+2);
+                }
+                else
+                {
+                    break;
+                }
+            }
+            while (txt.rfind("*/", endComment-2) > 0)
+            {
+                if (txt.rfind("*/", endComment-2) != -1 && txt.rfind("*/", endComment - 2) > startComment)
+                {
+                    endComment = txt.rfind("*/", endComment-2);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            if (endComment != -1  && startComment != -1)
+            {
+                txt.erase(startComment, endComment - startComment + 2);
+            }
+            else if (startComment != -1)
+            {
+                txt.erase(startComment, txt.size() - startComment);
+            }
+        }        
+
+        while (txt.find("//", 0) != -1)
+        {
+            startComment = txt.find("//", 0);
+            endComment = txt.find("\n", startComment);
+            txt.erase(startComment, endComment - startComment + 2);
+        }
+        cout << '\n' << txt << endl;
+        return "";
+    }
+};
+
+
 int main()
 {
-    int firstLetterPos = 0;
     string txt = "       gd      f  fg dfg d      fg df g df   gdf gdf gd g  d      f gd gd   gdf gdf d g  dfegd gd fg dg fg df       f ";
-    cout << txt << endl;
-    cout << txt.length() << endl;
-    while (isspace(txt[txt.size() - 1]))
-    { 
-        txt.pop_back();
-    }
-    firstLetterPos = txt.find_first_not_of(" ");
-    int spacefound = 0;
+    StringWorker sw{ txt };
+    sw.RemoveSpaces();
+    txt = sw.GetTxt();
 
-    while ((spacefound = txt.find("  ", firstLetterPos)) >= 0)
-    {
-        if (spacefound > firstLetterPos)
-        {
-            txt.replace(spacefound, 2, " ");
-        }
-    }   
+    string defaultTxt = "// int firstLetterPos = 0; \n string txt = 'gd      f  fg dfg d      fg df g df   gdf gdf gd g  d      f gd gd   gdf gdf d g  dfegd gd fg dg fg df       f ';\n /*cout << txt << endl;\n /*cout << txt.length() <<*/ endl; \n */ while (isspace/*(txt[txt.size() - 1]))  {\n */txt.pop_back();\n }\n ";
+    StringWorker sw2{ defaultTxt };
+    sw2.RemoveComment();
 
-    cout << txt << endl;
-    cout << txt.length() << endl;
-
+    
     return 0;
 }
 
